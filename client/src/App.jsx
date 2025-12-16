@@ -15,7 +15,7 @@ import DriverVehicleProfile from "./pages/profile/DriverVehicleProfile";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Ai from "./components/ai";
+import Ai from "./components/Ai";
 import Payment from "./pages/Payment";
 import ReviewPage from "./components/ReviewPage";
 
