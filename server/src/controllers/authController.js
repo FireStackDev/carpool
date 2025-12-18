@@ -24,6 +24,8 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
+    console.log(password)
+
     const user = await User.create({
       name,
       email,
@@ -44,10 +46,15 @@ const registerUser = async (req, res) => {
 
 // ================= LOGIN =================
 const loginUser = async (req, res) => {
+  console.log("Login User Controller ... ")
+
+  console.log(req.body);
+
   try {
     const { email, password, role } = req.body;
 
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }

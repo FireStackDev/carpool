@@ -37,14 +37,17 @@ export default function Login() {
     }
 
     // ================= PASSENGER / DRIVER LOGIN =================
+    console.log("Passenger / Driver Login ... ")
     try {
-      setLoading(true);
+      console.log("Try  ... ", form, role)
 
       const res = await api.post("/auth/login", {
         email: form.email,
         password: form.password,
         role,
       });
+
+      console.log(res);
 
       const { token, user } = res.data;
 

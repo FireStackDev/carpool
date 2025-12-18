@@ -31,8 +31,8 @@ const authLimiter = rateLimit({
 });
 
 // Routes
-app.use("/api/auth", authLimiter, authRoutes);
-app.use("/api/users", userRoutes); // ✅ THIS FIXES YOUR ERROR
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes); 
 app.use("/api/admin", adminRoutes);
 app.use("/api/sos", sosRoutes);
 app.use("/api/driver", driverRoutes);

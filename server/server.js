@@ -4,7 +4,9 @@ const app = require('./src/app');
 const connectDB = require('./src/config/db');
 const sosRoutes = require("./src/routes/sosRoutes"); // path to your Python trigger route
 
-const PORT = process.env.PORT || 5000;
+
+// const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
 const startServer = async () => {
   try {
