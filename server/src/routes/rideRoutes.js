@@ -5,10 +5,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// CREATE RIDE (DRIVER)
+// // CREATE RIDE (DRIVER)
 router.post(
   "/",
-  authMiddleware,
+  authMiddleware.protect,
   [
     body("origin").notEmpty(),
     body("destination").notEmpty(),
@@ -19,16 +19,16 @@ router.post(
   rideController.createRide
 );
 
-// GET AVAILABLE RIDES (PASSENGER)
-router.get("/", authMiddleware, rideController.getAvailableRides);
+// // GET AVAILABLE RIDES (PASSENGER)
+router.get("/", authMiddleware.protect, rideController.getAvailableRides);
 
-// GET DRIVER RIDES (IMPORTANT)
-router.get("/my", authMiddleware, rideController.getDriverRides);
+// // GET DRIVER RIDES (IMPORTANT)
+router.get("/my", authMiddleware.protect, rideController.getDriverRides);
 
-// SOS
-router.post("/:rideId/sos", authMiddleware, rideController.sendSOS);
+// // SOS
+router.post("/:rideId/sos", authMiddleware.protect, rideController.sendSOS);
 
-// REVIEW
-router.post("/:rideId/review", authMiddleware, rideController.addReview);
+// // REVIEW
+router.post("/:rideId/review", authMiddleware.protect, rideController.addReview);
 
 module.exports = router;

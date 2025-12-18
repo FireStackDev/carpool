@@ -466,11 +466,11 @@ function LoggedInHome({ user }) {
 
   // search form state (for passenger)
   const [search, setSearch] = useState({
-  from: "",
-  to: "",
-  date: "",
-  time: "",
-});
+    from: "",
+    to: "",
+    date: "",
+    time: "",
+  });
 
   // rides shown in the list (initially none)
   const [results, setResults] = useState([]);
@@ -484,10 +484,10 @@ function LoggedInHome({ user }) {
   //   carModel: "Sedan",
   // });
   const [driverRide, setDriverRide] = useState({
-  origin: "",
-  destination: "",
-  date: "",
-  seatsAvailable: 1,
+    origin: "",
+    destination: "",
+    date: "",
+    seatsAvailable: 1,
   });
 
 
@@ -505,28 +505,28 @@ function LoggedInHome({ user }) {
   //   setResults(filtered);
   // };
   const handleSearch = async () => {
-  try {
-    const res = await api.get("/rides");
+    try {
+      const res = await api.get("/rides");
 
-    // optional frontend filter
-    // const filtered = res.data.filter(
-    //   (ride) =>
-    //     (!search.from || ride.origin === search.from) &&
-    //     (!search.to || ride.destination === search.to)
-    // );
-    const filtered = res.data.filter(
-  (ride) =>
-    ride.origin === search.from &&
-    ride.destination === search.to
-);
+      // optional frontend filter
+      // const filtered = res.data.filter(
+      //   (ride) =>
+      //     (!search.from || ride.origin === search.from) &&
+      //     (!search.to || ride.destination === search.to)
+      // );
+      const filtered = res.data.filter(
+        (ride) =>
+          ride.origin === search.from &&
+          ride.destination === search.to
+      );
 
 
-    setResults(filtered);
-  } catch (error) {
-    console.error(error);
-    alert("❌ Failed to fetch rides");
-  }
-};
+      setResults(filtered);
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to fetch rides");
+    }
+  };
 
 
   // DRIVER "OFFER RIDE" HANDLERS
@@ -541,44 +541,44 @@ function LoggedInHome({ user }) {
   //     return;
   //   }
   const handleDriverRideSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    if (
-      !driverRide.origin ||
-      !driverRide.destination ||
-      !driverRide.date
-    ) {
-      alert("Please fill all required fields");
-      return;
+    try {
+      if (
+        !driverRide.origin ||
+        !driverRide.destination ||
+        !driverRide.date
+      ) {
+        alert("Please fill all required fields");
+        return;
+      }
+
+      // Simple auto-price logic (teacher-friendly)
+      const BASE_FARE = 50;
+      const pricePerSeat =
+        BASE_FARE + driverRide.origin.length * 5;
+
+      await api.post("/rides", {
+        origin: driverRide.origin,
+        destination: driverRide.destination,
+        date: driverRide.date,
+        seatsAvailable: driverRide.seatsAvailable,
+        pricePerSeat,
+      });
+
+      alert("✅ Ride created successfully");
+
+      setDriverRide({
+        origin: "",
+        destination: "",
+        date: "",
+        seatsAvailable: 1,
+      });
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to create ride");
     }
-
-    // Simple auto-price logic (teacher-friendly)
-    const BASE_FARE = 50;
-    const pricePerSeat =
-      BASE_FARE + driverRide.origin.length * 5;
-
-    await api.post("/rides", {
-      origin: driverRide.origin,
-      destination: driverRide.destination,
-      date: driverRide.date,
-      seatsAvailable: driverRide.seatsAvailable,
-      pricePerSeat,
-    });
-
-    alert("✅ Ride created successfully");
-
-    setDriverRide({
-      origin: "",
-      destination: "",
-      date: "",
-      seatsAvailable: 1,
-    });
-  } catch (error) {
-    console.error(error);
-    alert("❌ Failed to create ride");
-  }
-};
+  };
 
   // BOOK SEAT HANDLER (passenger)
   const handleBookSeat = (ride) => {
@@ -890,89 +890,89 @@ function LoggedInHome({ user }) {
                   </div>
                 </div> */}
                 <div className="grid md:grid-cols-2 gap-4">
-  {/* SOURCE */}
-  <div>
-    <label className="block text-xs font-medium text-slate-500 mb-1">
-      Source Location
-    </label>
-    <input
-      type="text"
-      placeholder="e.g., College Main Gate"
-      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      value={driverRide.origin}
-      onChange={(e) =>
-        setDriverRide({ ...driverRide, origin: e.target.value })
-      }
-    />
-  </div>
+                  {/* SOURCE */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                      Source Location
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., College Main Gate"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={driverRide.origin}
+                      onChange={(e) =>
+                        setDriverRide({ ...driverRide, origin: e.target.value })
+                      }
+                    />
+                  </div>
 
-  {/* DESTINATION */}
-  <div>
-    <label className="block text-xs font-medium text-slate-500 mb-1">
-      Destination
-    </label>
-    <input
-      type="text"
-      placeholder="e.g., City Bus Stand"
-      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      value={driverRide.destination}
-      onChange={(e) =>
-        setDriverRide({ ...driverRide, destination: e.target.value })
-      }
-    />
-  </div>
+                  {/* DESTINATION */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                      Destination
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., City Bus Stand"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={driverRide.destination}
+                      onChange={(e) =>
+                        setDriverRide({ ...driverRide, destination: e.target.value })
+                      }
+                    />
+                  </div>
 
-  {/* DATE & TIME */}
-  <div>
-    <label className="block text-xs font-medium text-slate-500 mb-1">
-      Departure Date &amp; Time
-    </label>
-    <input
-      type="datetime-local"
-      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      value={driverRide.date}
-      onChange={(e) =>
-        setDriverRide({ ...driverRide, date: e.target.value })
-      }
-    />
-  </div>
+                  {/* DATE & TIME */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                      Departure Date &amp; Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={driverRide.date}
+                      onChange={(e) =>
+                        setDriverRide({ ...driverRide, date: e.target.value })
+                      }
+                    />
+                  </div>
 
-  {/* SEATS */}
-  <div>
-    <label className="block text-xs font-medium text-slate-500 mb-1">
-      Available Seats
-    </label>
-    <input
-      type="number"
-      min="1"
-      max="6"
-      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      value={driverRide.seatsAvailable}
-      onChange={(e) =>
-        setDriverRide({
-          ...driverRide,
-          seatsAvailable: Number(e.target.value),
-        })
-      }
-    />
-  </div>
+                  {/* SEATS */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                      Available Seats
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="6"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={driverRide.seatsAvailable}
+                      onChange={(e) =>
+                        setDriverRide({
+                          ...driverRide,
+                          seatsAvailable: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
 
-  {/* CAR MODEL (UI ONLY, OPTIONAL) */}
-  <div>
-    <label className="block text-xs font-medium text-slate-500 mb-1">
-      Car Model
-    </label>
-    <select
-      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      disabled
-    >
-      <option>Sedan</option>
-      <option>Hatchback</option>
-      <option>SUV</option>
-      <option>Other</option>
-    </select>
-  </div>
-</div>
+                  {/* CAR MODEL (UI ONLY, OPTIONAL) */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                      Car Model
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      disabled
+                    >
+                      <option>Sedan</option>
+                      <option>Hatchback</option>
+                      <option>SUV</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                </div>
 
                 <button
                   type="submit"
@@ -1004,80 +1004,80 @@ function LoggedInHome({ user }) {
 
               {/* Search bar */}
               {/* Search bar */}
-<div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row gap-3 items-center">
-  <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row gap-3 items-center">
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
 
-    {/* FROM */}
-    <div>
-      <label className="block text-xs font-medium text-slate-500">
-        From
-      </label>
-      <input
-        type="text"
-        placeholder="Enter pickup location"
-        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-        value={search.from}
-        onChange={(e) =>
-          setSearch({ ...search, from: e.target.value })
-        }
-      />
-    </div>
+                  {/* FROM */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500">
+                      From
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter pickup location"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      value={search.from}
+                      onChange={(e) =>
+                        setSearch({ ...search, from: e.target.value })
+                      }
+                    />
+                  </div>
 
-    {/* TO */}
-    <div>
-      <label className="block text-xs font-medium text-slate-500">
-        To
-      </label>
-      <input
-        type="text"
-        placeholder="Enter drop location"
-        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-        value={search.to}
-        onChange={(e) =>
-          setSearch({ ...search, to: e.target.value })
-        }
-      />
-    </div>
+                  {/* TO */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500">
+                      To
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter drop location"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      value={search.to}
+                      onChange={(e) =>
+                        setSearch({ ...search, to: e.target.value })
+                      }
+                    />
+                  </div>
 
-    {/* DATE */}
-    <div>
-      <label className="block text-xs font-medium text-slate-500">
-        Date
-      </label>
-      <input
-        type="date"
-        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-        value={search.date}
-        onChange={(e) =>
-          setSearch({ ...search, date: e.target.value })
-        }
-      />
-    </div>
+                  {/* DATE */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      value={search.date}
+                      onChange={(e) =>
+                        setSearch({ ...search, date: e.target.value })
+                      }
+                    />
+                  </div>
 
-    {/* TIME */}
-    <div>
-      <label className="block text-xs font-medium text-slate-500">
-        Time
-      </label>
-      <input
-        type="time"
-        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-        value={search.time}
-        onChange={(e) =>
-          setSearch({ ...search, time: e.target.value })
-        }
-      />
-    </div>
-  </div>
+                  {/* TIME */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500">
+                      Time
+                    </label>
+                    <input
+                      type="time"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                      value={search.time}
+                      onChange={(e) =>
+                        setSearch({ ...search, time: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
 
-  <button
-    className="w-full lg:w-auto px-6 py-2.5 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
-    onClick={handleSearch}
-  >
-    Search Rides
-  </button>
-</div>
-  
+                <button
+                  className="w-full lg:w-auto px-6 py-2.5 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+                  onClick={handleSearch}
+                >
+                  Search Rides
+                </button>
+              </div>
+
               {/* Map + demo rides */}
               <div className="grid lg:grid-cols-2 gap-5">
                 {/* Map (Leaflet) */}
@@ -1087,52 +1087,52 @@ function LoggedInHome({ user }) {
 
                 {/* Demo rides list */}
                 <div className="space-y-3">
-  {results.length === 0 ? (
-    <div className="border border-dashed border-slate-300 rounded-2xl p-4 text-sm text-slate-500 bg-white">
-      No rides to show yet. Use the search above to see rides.
-    </div>
-  ) : (
-    results.map((ride) => (
-      <div
-        key={ride._id}
-        className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between gap-3 shadow-sm bg-white"
-      >
-        <div className="space-y-1 text-sm">
-          <p className="font-semibold text-slate-900">
-            {ride.origin} → {ride.destination}
-          </p>
+                  {results.length === 0 ? (
+                    <div className="border border-dashed border-slate-300 rounded-2xl p-4 text-sm text-slate-500 bg-white">
+                      No rides to show yet. Use the search above to see rides.
+                    </div>
+                  ) : (
+                    results.map((ride) => (
+                      <div
+                        key={ride._id}
+                        className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between gap-3 shadow-sm bg-white"
+                      >
+                        <div className="space-y-1 text-sm">
+                          <p className="font-semibold text-slate-900">
+                            {ride.origin} → {ride.destination}
+                          </p>
 
-          <p className="text-slate-500">
-            Date & Time:{" "}
-            <span className="font-medium">
-              {new Date(ride.date).toLocaleString()}
-            </span>
-          </p>
+                          <p className="text-slate-500">
+                            Date & Time:{" "}
+                            <span className="font-medium">
+                              {new Date(ride.date).toLocaleString()}
+                            </span>
+                          </p>
 
-          <p className="text-slate-500">
-            Driver:{" "}
-            <span className="font-medium">
-              {ride.driver?.name || "Driver"}
-            </span>
-          </p>
-        </div>
+                          <p className="text-slate-500">
+                            Driver:{" "}
+                            <span className="font-medium">
+                              {ride.driver?.name || "Driver"}
+                            </span>
+                          </p>
+                        </div>
 
-        <div className="flex items-center gap-3">
-          <p className="text-lg font-semibold text-indigo-600">
-            ₹{ride.pricePerSeat}
-          </p>
+                        <div className="flex items-center gap-3">
+                          <p className="text-lg font-semibold text-indigo-600">
+                            ₹{ride.pricePerSeat}
+                          </p>
 
-          <button
-            onClick={() => handleBookSeat(ride)}
-            className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
-          >
-            Book Seat
-          </button>
-        </div>
-      </div>
-    ))
-  )}
-</div>
+                          <button
+                            onClick={() => handleBookSeat(ride)}
+                            className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
+                          >
+                            Book Seat
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
 
               </div>
             </>

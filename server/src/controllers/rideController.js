@@ -6,6 +6,8 @@ const Ride = require("../models/Ride");
  * POST /api/rides
  */
 exports.createRide = async (req, res) => {
+  console.log("Create Ride Fired !");
+  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({

@@ -3,12 +3,14 @@ const User = require('../models/User');
 
 const protect = async (req, res, next) => {
   let token;
+  console.log("auth middleware protect");
 
+  
   if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer ')
+    req.headers.authorization && req.headers.authorization.startsWith('Bearer ')
   ) {
     token = req.headers.authorization.split(' ')[1];
+    console.log(token);
   }
 
   if (!token) {
@@ -22,6 +24,9 @@ const protect = async (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'User no longer exists' });
     }
+
+    // middleware passed
+    // console.log(req.body)
 
     next();
   } catch (error) {

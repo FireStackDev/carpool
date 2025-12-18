@@ -7,7 +7,7 @@ export default function DriverMyRides() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/rides/driver/my").then(res => {
+    api.get("/rides/my").then(res => {
       setRides(res.data);
     });
   }, []);

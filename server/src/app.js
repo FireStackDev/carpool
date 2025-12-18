@@ -10,6 +10,8 @@ const sosRoutes = require("./routes/sosRoutes");
 const userRoutes = require("./routes/userRoutes"); // ✅ ADD THIS
 const driverRoutes = require("./routes/driverRoutes");
 
+const rideRoutes = require("./routes/rideRoutes");
+
 const app = express();
 
 // Middlewares
@@ -38,6 +40,7 @@ app.use("/api/sos", sosRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/community", require("./routes/communityRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/rides", rideRoutes)
 
 
 
