@@ -37,6 +37,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/sos", sosRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/community", require("./routes/communityRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
+
 
 
 // Health check

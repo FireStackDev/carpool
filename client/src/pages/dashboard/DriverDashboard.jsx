@@ -29,16 +29,28 @@ export default function DriverDashboard() {
         {/* ACTION CARDS */}
         <div className="grid md:grid-cols-2 gap-6">
           <DashboardCard icon="➕" title="Create Ride">
-            <p className="text-sm text-slate-600 mb-3">
-              Offer a new carpool ride to passengers on your route.
-            </p>
-            <Link
-              to="/driver/create-ride"
-              className="inline-block bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold"
-            >
-              Create Ride
-            </Link>
-          </DashboardCard>
+  <p className="text-sm text-slate-600 mb-3">
+    Offer a new carpool ride to passengers on your route.
+  </p>
+
+  <div className="flex gap-3">
+    {/* Create ride */}
+    <Link
+      to="/driver/create-ride"
+      className="inline-block bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold"
+    >
+      Create Ride
+    </Link>
+
+    {/* View created rides */}
+    <Link
+      to="/driver/my-rides"
+      className="inline-block border border-indigo-600 text-indigo-600 px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-50"
+    >
+      My Rides
+    </Link>
+  </div>
+</DashboardCard>
 
           <DashboardCard icon="🚨" title="SOS / Emergency">
             <p className="text-sm text-slate-600">

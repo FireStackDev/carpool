@@ -52,14 +52,29 @@ export default function PassengerDashboard() {
         <div className="grid lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-4">
             <DashboardCard icon="🚐" title="Rides">
-              <p>
-                Search for rides based on route, date and time. Book seats and
-                view your ride history.
-              </p>
-              <button className="mt-3 px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700">
-                Search rides
-              </button>
-            </DashboardCard>
+  <p>
+    Search for rides based on route, date and time. Book seats and
+    view your ride history.
+  </p>
+
+  <div className="flex gap-3 mt-3">
+    {/* Search rides */}
+    <button
+      onClick={() => navigate("/passenger/book-rides")}
+      className="px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
+    >
+      Search rides
+    </button>
+
+    {/* View ride details */}
+    <Link
+      to="/passenger/my-rides"
+      className="px-4 py-2 rounded-full text-xs font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-50"
+    >
+      My Rides
+    </Link>
+  </div>
+</DashboardCard>
 
             <DashboardCard icon="🚨" title="SOS Center">
               <p>

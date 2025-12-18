@@ -4,22 +4,28 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+
 import PassengerDashboard from "./pages/dashboard/PassengerDashboard";
 import DriverDashboard from "./pages/dashboard/DriverDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
+
 import PassengerProfilePage from "./pages/profile/PassengerProfilePage";
 import DriverProfilePage from "./pages/profile/DriverProfilePage";
 import CompleteProfile from "./pages/profile/CompleteProfile";
 import DriverVehicleProfile from "./pages/profile/DriverVehicleProfile";
 
+import PassengerMyRides from "./pages/passenger/MyRides";
+import PassengerRideDetails from "./pages/passenger/RideDetails";
+import DriverMyRides from "./pages/driver/MyRides";
+import DriverRideDetails from "./pages/driver/RideDetails";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Ai from "./components/Ai";
 import Payment from "./pages/Payment";
 import ReviewPage from "./components/ReviewPage";
 
-// 🔹 COMMUNITY PAGES
 import CommunityList from "./pages/CommunityList";
 import Community from "./pages/Community";
 
@@ -52,11 +58,30 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/passenger/profile"
           element={
             <ProtectedRoute allowedRoles={["passenger"]}>
               <PassengerProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/passenger/my-rides"
+          element={
+            <ProtectedRoute allowedRoles={["passenger"]}>
+              <PassengerMyRides />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/passenger/ride/:id"
+          element={
+            <ProtectedRoute allowedRoles={["passenger"]}>
+              <PassengerRideDetails />
             </ProtectedRoute>
           }
         />
@@ -70,6 +95,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/driver/profile"
           element={
@@ -78,7 +104,34 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/driver/vehicle" element={<DriverVehicleProfile />} />
+
+        <Route
+          path="/driver/vehicle"
+          element={
+            <ProtectedRoute allowedRoles={["driver"]}>
+              <DriverVehicleProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/driver/my-rides"
+          element={
+            <ProtectedRoute allowedRoles={["driver"]}>
+              <DriverMyRides />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/driver/ride/:id"
+          element={
+            <ProtectedRoute allowedRoles={["driver"]}>
+              <DriverRideDetails />
+            </ProtectedRoute>
+          }
+        />
+
         {/* ================= ADMIN ================= */}
         <Route
           path="/admin/dashboard"
@@ -100,7 +153,6 @@ function App() {
         />
 
         {/* ================= COMMUNITY ================= */}
-        {/* Community list page (navbar click) */}
         <Route
           path="/community"
           element={
@@ -110,7 +162,6 @@ function App() {
           }
         />
 
-        {/* Local community details page */}
         <Route
           path="/community/local"
           element={

@@ -3,39 +3,43 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import L from "leaflet";
+import api from "../utils/axios";
+import "leaflet/dist/leaflet.css";
+
+
 
 // ---------- DATA SHARED BETWEEN VIEWS ----------
 
 // Hard-coded demo rides
-const demoRides = [
-  {
-    id: 1,
-    from: "Ballygunge",
-    to: "Dum Dum",
-    time: "09:00 AM",
-    price: "₹180",
-    driver: "Aarav Singh",
-    rating: "4.8",
-  },
-  {
-    id: 2,
-    from: "Ballygunge",
-    to: "Salt Lake",
-    time: "10:30 AM",
-    price: "₹160",
-    driver: "Sneha Das",
-    rating: "4.6",
-  },
-  {
-    id: 3,
-    from: "Howrah",
-    to: "New Town",
-    time: "06:15 PM",
-    price: "₹210",
-    driver: "Rahul Verma",
-    rating: "4.9",
-  },
-];
+// const demoRides = [
+//   {
+//     id: 1,
+//     from: "Ballygunge",
+//     to: "Dum Dum",
+//     time: "09:00 AM",
+//     price: "₹180",
+//     driver: "Aarav Singh",
+//     rating: "4.8",
+//   },
+//   {
+//     id: 2,
+//     from: "Ballygunge",
+//     to: "Salt Lake",
+//     time: "10:30 AM",
+//     price: "₹160",
+//     driver: "Sneha Das",
+//     rating: "4.6",
+//   },
+//   {
+//     id: 3,
+//     from: "Howrah",
+//     to: "New Town",
+//     time: "06:15 PM",
+//     price: "₹210",
+//     driver: "Rahul Verma",
+//     rating: "4.9",
+//   },
+// ];
 
 // City → coordinates (rough positions in Kolkata)
 const cityCoords = {
@@ -462,62 +466,119 @@ function LoggedInHome({ user }) {
 
   // search form state (for passenger)
   const [search, setSearch] = useState({
-    from: "Ballygunge",
-    to: "Dum Dum",
-    date: "2025-11-16",
-    time: "09:00",
-  });
+  from: "",
+  to: "",
+  date: "",
+  time: "",
+});
 
   // rides shown in the list (initially none)
   const [results, setResults] = useState([]);
 
   // driver "offer ride" form state
+  // const [driverRide, setDriverRide] = useState({
+  //   source: "",
+  //   destination: "",
+  //   datetime: "",
+  //   seats: "1",
+  //   carModel: "Sedan",
+  // });
   const [driverRide, setDriverRide] = useState({
-    source: "",
-    destination: "",
-    datetime: "",
-    seats: "1",
-    carModel: "Sedan",
+  origin: "",
+  destination: "",
+  date: "",
+  seatsAvailable: 1,
   });
+
 
   // SEARCH HANDLERS (passenger)
   const handleSearchChange = (field) => (e) => {
     setSearch((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleSearch = () => {
-    const filtered = demoRides.filter(
-      (r) =>
-        (search.from ? r.from === search.from : true) &&
-        (search.to ? r.to === search.to : true)
-    );
+  // const handleSearch = () => {
+  //   const filtered = demoRides.filter(
+  //     (r) =>
+  //       (search.from ? r.from === search.from : true) &&
+  //       (search.to ? r.to === search.to : true)
+  //   );
+  //   setResults(filtered);
+  // };
+  const handleSearch = async () => {
+  try {
+    const res = await api.get("/rides");
+
+    // optional frontend filter
+    // const filtered = res.data.filter(
+    //   (ride) =>
+    //     (!search.from || ride.origin === search.from) &&
+    //     (!search.to || ride.destination === search.to)
+    // );
+    const filtered = res.data.filter(
+  (ride) =>
+    ride.origin === search.from &&
+    ride.destination === search.to
+);
+
+
     setResults(filtered);
-  };
+  } catch (error) {
+    console.error(error);
+    alert("❌ Failed to fetch rides");
+  }
+};
+
 
   // DRIVER "OFFER RIDE" HANDLERS
   const handleDriverRideChange = (field) => (e) => {
     setDriverRide((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleDriverRideSubmit = (e) => {
-    e.preventDefault();
-    if (!driverRide.source || !driverRide.destination || !driverRide.datetime) {
-      alert("Please fill Source, Destination and Departure Date & Time.");
+  // const handleDriverRideSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (!driverRide.source || !driverRide.destination || !driverRide.datetime) {
+  //     alert("Please fill Source, Destination and Departure Date & Time.");
+  //     return;
+  //   }
+  const handleDriverRideSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    if (
+      !driverRide.origin ||
+      !driverRide.destination ||
+      !driverRide.date
+    ) {
+      alert("Please fill all required fields");
       return;
     }
 
-    alert(
-      `Demo: Ride posted from ${driverRide.source} to ${driverRide.destination} on ${driverRide.datetime}. In a real app this would be saved to the database.`
-    );
+    // Simple auto-price logic (teacher-friendly)
+    const BASE_FARE = 50;
+    const pricePerSeat =
+      BASE_FARE + driverRide.origin.length * 5;
+
+    await api.post("/rides", {
+      origin: driverRide.origin,
+      destination: driverRide.destination,
+      date: driverRide.date,
+      seatsAvailable: driverRide.seatsAvailable,
+      pricePerSeat,
+    });
+
+    alert("✅ Ride created successfully");
 
     setDriverRide({
-      source: "",
+      origin: "",
       destination: "",
-      datetime: "",
-      seats: "1",
-      carModel: "Sedan",
+      date: "",
+      seatsAvailable: 1,
     });
-  };
+  } catch (error) {
+    console.error(error);
+    alert("❌ Failed to create ride");
+  }
+};
 
   // BOOK SEAT HANDLER (passenger)
   const handleBookSeat = (ride) => {
@@ -541,7 +602,7 @@ function LoggedInHome({ user }) {
 
     navigate("/payment", {
       state: {
-        rideId: ride.id,
+        rideId: ride._id,
         seats,
         ride,
       },
@@ -591,14 +652,14 @@ function LoggedInHome({ user }) {
     const bounds = L.latLngBounds([]);
 
     results.forEach((ride) => {
-      const fromCoord = cityCoords[ride.from];
-      const toCoord = cityCoords[ride.to];
+      const fromCoord = cityCoords[ride.origin];
+      const toCoord = cityCoords[ride.destination];
       if (!fromCoord || !toCoord) return;
 
       const fromMarker = L.marker(fromCoord).addTo(map);
       const toMarker = L.marker(toCoord).addTo(map);
-      fromMarker.bindPopup(`${ride.from}`);
-      toMarker.bindPopup(`${ride.to}`);
+      fromMarker.bindPopup(`${ride.origin}`);
+      toMarker.bindPopup(`${ride.destination}`);
 
       const routeLine = L.polyline([fromCoord, toCoord], {
         color: "dodgerblue",
@@ -763,7 +824,7 @@ function LoggedInHome({ user }) {
                   Offer a New Ride
                 </h3>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                {/* <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-slate-500 mb-1">
                       Source Location
@@ -827,7 +888,91 @@ function LoggedInHome({ user }) {
                       <option value="Other">Other</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
+                <div className="grid md:grid-cols-2 gap-4">
+  {/* SOURCE */}
+  <div>
+    <label className="block text-xs font-medium text-slate-500 mb-1">
+      Source Location
+    </label>
+    <input
+      type="text"
+      placeholder="e.g., College Main Gate"
+      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      value={driverRide.origin}
+      onChange={(e) =>
+        setDriverRide({ ...driverRide, origin: e.target.value })
+      }
+    />
+  </div>
+
+  {/* DESTINATION */}
+  <div>
+    <label className="block text-xs font-medium text-slate-500 mb-1">
+      Destination
+    </label>
+    <input
+      type="text"
+      placeholder="e.g., City Bus Stand"
+      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      value={driverRide.destination}
+      onChange={(e) =>
+        setDriverRide({ ...driverRide, destination: e.target.value })
+      }
+    />
+  </div>
+
+  {/* DATE & TIME */}
+  <div>
+    <label className="block text-xs font-medium text-slate-500 mb-1">
+      Departure Date &amp; Time
+    </label>
+    <input
+      type="datetime-local"
+      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      value={driverRide.date}
+      onChange={(e) =>
+        setDriverRide({ ...driverRide, date: e.target.value })
+      }
+    />
+  </div>
+
+  {/* SEATS */}
+  <div>
+    <label className="block text-xs font-medium text-slate-500 mb-1">
+      Available Seats
+    </label>
+    <input
+      type="number"
+      min="1"
+      max="6"
+      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      value={driverRide.seatsAvailable}
+      onChange={(e) =>
+        setDriverRide({
+          ...driverRide,
+          seatsAvailable: Number(e.target.value),
+        })
+      }
+    />
+  </div>
+
+  {/* CAR MODEL (UI ONLY, OPTIONAL) */}
+  <div>
+    <label className="block text-xs font-medium text-slate-500 mb-1">
+      Car Model
+    </label>
+    <select
+      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      disabled
+    >
+      <option>Sedan</option>
+      <option>Hatchback</option>
+      <option>SUV</option>
+      <option>Other</option>
+    </select>
+  </div>
+</div>
 
                 <button
                   type="submit"
@@ -858,72 +1003,81 @@ function LoggedInHome({ user }) {
               </div>
 
               {/* Search bar */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row gap-3 items-center">
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-500">
-                      From (City)
-                    </label>
-                    <select
-                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                      value={search.from}
-                      onChange={handleSearchChange("from")}
-                    >
-                      <option value="Ballygunge">Ballygunge</option>
-                      <option value="Howrah">Howrah</option>
-                      <option value="Salt Lake">Salt Lake</option>
-                      <option value="New Town">New Town</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-500">
-                      To (City)
-                    </label>
-                    <select
-                      className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                      value={search.to}
-                      onChange={handleSearchChange("to")}
-                    >
-                      <option value="Dum Dum">Dum Dum</option>
-                      <option value="Howrah">Howrah</option>
-                      <option value="Salt Lake">Salt Lake</option>
-                      <option value="New Town">New Town</option>
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500">
-                        Date
-                      </label>
-                      <input
-                        type="date"
-                        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                        value={search.date}
-                        onChange={handleSearchChange("date")}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500">
-                        Time
-                      </label>
-                      <input
-                        type="time"
-                        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                        value={search.time}
-                        onChange={handleSearchChange("time")}
-                      />
-                    </div>
-                  </div>
-                </div>
+              {/* Search bar */}
+<div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row gap-3 items-center">
+  <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
 
-                <button
-                  className="w-full lg:w-auto px-6 py-2.5 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
-                  onClick={handleSearch}
-                >
-                  Search Rides
-                </button>
-              </div>
+    {/* FROM */}
+    <div>
+      <label className="block text-xs font-medium text-slate-500">
+        From
+      </label>
+      <input
+        type="text"
+        placeholder="Enter pickup location"
+        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+        value={search.from}
+        onChange={(e) =>
+          setSearch({ ...search, from: e.target.value })
+        }
+      />
+    </div>
 
+    {/* TO */}
+    <div>
+      <label className="block text-xs font-medium text-slate-500">
+        To
+      </label>
+      <input
+        type="text"
+        placeholder="Enter drop location"
+        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+        value={search.to}
+        onChange={(e) =>
+          setSearch({ ...search, to: e.target.value })
+        }
+      />
+    </div>
+
+    {/* DATE */}
+    <div>
+      <label className="block text-xs font-medium text-slate-500">
+        Date
+      </label>
+      <input
+        type="date"
+        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+        value={search.date}
+        onChange={(e) =>
+          setSearch({ ...search, date: e.target.value })
+        }
+      />
+    </div>
+
+    {/* TIME */}
+    <div>
+      <label className="block text-xs font-medium text-slate-500">
+        Time
+      </label>
+      <input
+        type="time"
+        className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+        value={search.time}
+        onChange={(e) =>
+          setSearch({ ...search, time: e.target.value })
+        }
+      />
+    </div>
+  </div>
+
+  <button
+    className="w-full lg:w-auto px-6 py-2.5 rounded-full bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+    onClick={handleSearch}
+  >
+    Search Rides
+  </button>
+</div>
+  
               {/* Map + demo rides */}
               <div className="grid lg:grid-cols-2 gap-5">
                 {/* Map (Leaflet) */}
@@ -933,46 +1087,53 @@ function LoggedInHome({ user }) {
 
                 {/* Demo rides list */}
                 <div className="space-y-3">
-                  {results.length === 0 ? (
-                    <div className="border border-dashed border-slate-300 rounded-2xl p-4 text-sm text-slate-500 bg-white">
-                      No rides to show yet. Use the search above to see demo
-                      rides.
-                    </div>
-                  ) : (
-                    results.map((ride) => (
-                      <div
-                        key={ride.id}
-                        className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between gap-3 shadow-sm bg-white"
-                      >
-                        <div className="space-y-1 text-sm">
-                          <p className="font-semibold text-slate-900">
-                            {ride.from} → {ride.to}
-                          </p>
-                          <p className="text-slate-500">
-                            Time:{" "}
-                            <span className="font-medium">{ride.time}</span>
-                          </p>
-                          <p className="text-slate-500">
-                            Driver:{" "}
-                            <span className="font-medium">{ride.driver}</span>{" "}
-                            • ⭐ {ride.rating}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <p className="text-lg font-semibold text-indigo-600">
-                            {ride.price}
-                          </p>
-                          <button
-                            onClick={() => handleBookSeat(ride)}
-                            className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
-                          >
-                            Book Seat
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+  {results.length === 0 ? (
+    <div className="border border-dashed border-slate-300 rounded-2xl p-4 text-sm text-slate-500 bg-white">
+      No rides to show yet. Use the search above to see rides.
+    </div>
+  ) : (
+    results.map((ride) => (
+      <div
+        key={ride._id}
+        className="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between gap-3 shadow-sm bg-white"
+      >
+        <div className="space-y-1 text-sm">
+          <p className="font-semibold text-slate-900">
+            {ride.origin} → {ride.destination}
+          </p>
+
+          <p className="text-slate-500">
+            Date & Time:{" "}
+            <span className="font-medium">
+              {new Date(ride.date).toLocaleString()}
+            </span>
+          </p>
+
+          <p className="text-slate-500">
+            Driver:{" "}
+            <span className="font-medium">
+              {ride.driver?.name || "Driver"}
+            </span>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <p className="text-lg font-semibold text-indigo-600">
+            ₹{ride.pricePerSeat}
+          </p>
+
+          <button
+            onClick={() => handleBookSeat(ride)}
+            className="px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
+          >
+            Book Seat
+          </button>
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
               </div>
             </>
           )}
